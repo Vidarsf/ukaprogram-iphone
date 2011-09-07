@@ -10,9 +10,6 @@
 #import "Event.h"
 #import "UKEprogramAppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
-#import "Facebook.h"
-#import "FriendsTableViewController.h"
-#import "OAuthConsumer.h"
 #import "JSON.h"
 #import "StartViewController.h"
 
@@ -24,14 +21,14 @@ IBOutlet UIImage *eventImg;
 */
 @implementation EventDetailsViewController
 @synthesize headerLabel;
+@synthesize footerLabel;
 @synthesize leadLabel;
 @synthesize textLabel;
 @synthesize event;
 @synthesize sView;
 @synthesize eventImgView;
 @synthesize notInUseLabel;
-@synthesize attendingButton;
-@synthesize friendsButton;
+@synthesize loadSpinner;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -44,8 +41,8 @@ IBOutlet UIImage *eventImg;
 
 - (void)dealloc
 {
+    [loadSpinner release];
     [super dealloc];
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,61 +54,6 @@ IBOutlet UIImage *eventImg;
 }
 
 #pragma mark - View lifecycle
-
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView
-{
-}
-*/
-- (void)attendDidChange
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    if (![delegate isInMyEvents:event.id]) {
-        [attendingButton setTitle:@"Sett som deltakende" forState:UIControlStateNormal];
-    } else {
-        [attendingButton setTitle:@"Ikke delta" forState:UIControlStateNormal];
-    }
-}
-
-- (void)attendingClicked:(id)sender
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [delegate flipAttendStatus:event.id];
-    [self attendDidChange];
-}
-
-- (void)pushFriendsView:(id)sender
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [delegate.rootController pushViewController:friendsTableViewController animated:YES];
-}
-
-
-- (void)setLoginButtons
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    if (![delegate isLoggedIn]) {
-        [friendsButton setFrame:CGRectMake(8, 220, 250, 37)];
-        [friendsButton setTitle:@"Logg inn for å se deltakende venner" forState:UIControlStateNormal];
-        [friendsButton addTarget:self action:@selector(fbLoginClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [attendingButton setHidden:YES];
-    } else {
-        [friendsButton setFrame:CGRectMake(8, 220, 167, 37)];
-        [friendsButton setHidden:NO];
-        if (friendsTableViewController.listOfFriends == nil) {//prevent loading when friends are already loaded
-            [friendsTableViewController loadFriends:self];
-        }
-        [friendsButton addTarget:self action:@selector(pushFriendsView:) forControlEvents:UIControlEventTouchUpInside];
-        if (![delegate isLoggedIn]) {
-            [attendingButton setHidden:YES];
-        } else {
-            [self attendDidChange];
-            [attendingButton setHidden:NO];
-            [attendingButton addTarget:self action:@selector(attendingClicked:) forControlEvents:UIControlEventTouchUpInside];
-        }
-    }
-}
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -132,12 +74,23 @@ IBOutlet UIImage *eventImg;
     
     [leadLabel setText:event.lead];
     [textLabel setText:event.text];
+    leadLabel.font = [UIFont boldSystemFontOfSize:14];
+    textLabel.font = [UIFont systemFontOfSize:14];
     
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     NSString *dateString = [[NSString alloc] initWithFormat:@"%@ %@", [delegate.onlyDateFormat stringFromDate:event.showingTime], [delegate.onlyTimeFormat stringFromDate:event.showingTime]]; 
-    NSString *labelText = [[NSString alloc] initWithFormat:@"%@ %@ %@ %i,-", event.placeString, [delegate getWeekDay:event.showingTime], dateString, [event.lowestPrice intValue]];
+    NSString *labelText = [[NSString alloc] initWithFormat:@"%@  %@  %@", event.placeString, [delegate getWeekDay:event.showingTime], dateString];
     [dateString release];
+    
+    //header and footer
     [headerLabel setText:labelText];
+    headerLabel.backgroundColor = [delegate getColorForEventCategory:event.eventType];
+    headerLabel.textColor = [UIColor darkGrayColor];
+    
+    footerLabel.text = [NSString stringWithFormat:@"%@ år  %i,-", event.ageLimit, [event.lowestPrice intValue]];
+    footerLabel.backgroundColor = [delegate getColorForEventCategory:event.eventType];
+    footerLabel.textColor = [UIColor darkGrayColor];
+    
     [labelText release];
     //find the size of lead and description text
     CGSize constraintSize = CGSizeMake(300.0f, MAXFLOAT);
@@ -151,8 +104,6 @@ IBOutlet UIImage *eventImg;
 
     sView = (UIScrollView *) self.view;
     sView.contentSize=CGSizeMake(1, leadHeight + textHeight + 290);//1 is less than width of iphone
-    friendsTableViewController = [[FriendsTableViewController alloc] initWithNibName:@"FriendsTableView" bundle:nil];
-    
     
     favButton = [UIButton buttonWithType:UIButtonTypeCustom];
     favButton.frame = CGRectMake(0, 0, delegate.checkedImage.size.width*2, delegate.checkedImage.size.height*2);
@@ -164,6 +115,11 @@ IBOutlet UIImage *eventImg;
        [favButton setImage:delegate.uncheckedImage forState:UIControlStateNormal];
     }
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:favButton] autorelease];
+    
+    //Put the loadSpinner into the eventImgView
+    loadSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [loadSpinner setCenter:CGPointMake(eventImgView.frame.size.width/2, eventImgView.frame.size.height/2)];
+    [eventImgView addSubview:loadSpinner];
 }
 
 - (void)favoritesClicked:(id)sender
@@ -180,37 +136,71 @@ IBOutlet UIImage *eventImg;
         [favButton setImage:delegate.checkedImage forState:UIControlStateNormal];
     }
     if (![con save:&error]) {
-        NSLog(@"Lagring av %@ feilet", event.title);
+        //NSLog(@"Lagring av %@ feilet", event.title);
     } else {
-        NSLog(@"Lagret event %@", event.title);
+        //NSLog(@"Lagret event %@", event.title);
     }
 }
-- (void)fbLoginClicked:(id)sender
-{
-    NSArray *views = self.navigationController.viewControllers;
-    StartViewController *sView = (StartViewController *)[views objectAtIndex:0];
-    [sView loginFacebook];
-}
-
-
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    //Start spinner to indicate image is loading
+    [loadSpinner startAnimating];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    if (friendsTableViewController.listOfFriends == nil) {//prevent loading when friends are already loaded
-        //check if you should load image?
-        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://uka.no/%@", event.image]]]];
-        if (img != nil) {
-            NSLog(@"Bildet %@ hentet", event.image);
-            eventImgView.image = img;
+    
+    //Check if you should load image?
+    NSString *docDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    
+    // Create file manager
+    NSError *error;
+    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    
+    //Extract the filename
+    NSArray *split = [event.image componentsSeparatedByString:@"/"];
+    NSString *fileNameWithoutExtention = [split objectAtIndex:[split count] - 1];
+    fileNameWithoutExtention = [fileNameWithoutExtention stringByDeletingPathExtension];
+    
+    //Find all stored images
+    NSArray *listOfImages = [fileMgr contentsOfDirectoryAtPath:docDir error:&error];
+    NSString *savedImage;
+    
+    BOOL doWeNeedToDownLoadImage = YES;
+    
+    for (id file in listOfImages) {
+        if ([file isKindOfClass:[NSString class]] && [[file stringByDeletingPathExtension] isEqualToString:fileNameWithoutExtention] ) {
+            doWeNeedToDownLoadImage = NO;
+            savedImage = [NSString stringWithFormat:@"%@/%@", docDir, file];
         }
     }
-    [self setLoginButtons];
+    UIImage *placeHolderImage = [UIImage imageNamed:@"placeHolderImage.png"];
+    
+    if (doWeNeedToDownLoadImage) {
+        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://uka.no/%@", event.image]]]];
+        if (img != nil) {
+            eventImgView.image = img;
+            NSString *jpegFilePath = [NSString stringWithFormat:@"%@/%@.jpeg",docDir,fileNameWithoutExtention];
+            NSData *data = [NSData dataWithData:UIImageJPEGRepresentation(img, 1.0f)];//1.0f = 100% quality
+            [data writeToFile:jpegFilePath atomically:YES];
+        } else {
+            eventImgView.image = placeHolderImage;
+        }
+    } else {
+        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfFile:savedImage]];
+        if (img != nil) {
+            eventImgView.image = img;
+        } else {
+            eventImgView.image = placeHolderImage;
+        }
+    }
+    
+    //Stop spinner when image is loaded
+    [loadSpinner stopAnimating];
+    
 }
 
 - (void)viewDidUnload
@@ -218,7 +208,6 @@ IBOutlet UIImage *eventImg;
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-    [friendsTableViewController release];
     [favButton release];
     [event release];
 }
@@ -226,7 +215,10 @@ IBOutlet UIImage *eventImg;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return (interfaceOrientation == UIInterfaceOrientationPortrait || 
+            interfaceOrientation == UIInterfaceOrientationLandscapeRight || 
+            interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+            interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
 }
 
 @end

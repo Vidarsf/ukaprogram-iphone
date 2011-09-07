@@ -12,26 +12,27 @@
 #import "JSON.h"
 #import "Event.h"
 #import "FilterViewController.h"
-#import "FriendsTableViewController.h"
 
 @implementation EventsTableViewController
 
 @synthesize eventDetailsViewController;
 @synthesize listOfEvents;
-@synthesize datePicker;
 @synthesize filterViewController;
 @synthesize eTableView;
 @synthesize pickerView;
 UIButton *filterButton;
 UIButton *datePickButton;
-UIButton *editAttendingButton;
 UIToolbar *toolbar;
-BOOL editAttending;
-//int days;
 NSMutableArray *sectListOfEvents;
 static int secondsInDay = 86400;
-static int pickerWidth = 50;
-static int pickerOffset = 135;
+
+static int dateBoxOffset = 125;
+static int dateBoxWidth =70;
+static int dateBoxTextWidth =66;
+static int dateBoxSeparatorWidth = 2;
+
+static int eTableScrollIndex = 0;
+
 bool isUsingPicker = NO;
 
 
@@ -42,27 +43,74 @@ bool isUsingPicker = NO;
 
 -(void)createPickerDates
 {
+    //place background image
+    UIImageView *bildeView2 = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 42)];
+    UIImage *backImg = [UIImage imageNamed:@"datePickerBackground.png"];
+    [bildeView2 setImage:backImg];
+    [bildeView2 setAlpha:0.35];
+    [self.view addSubview:bildeView2];
+    [bildeView2 release];
+    
+    
     UKEprogramAppDelegate *del = [[UIApplication sharedApplication] delegate];
     NSDateFormatter *onlyDateFormat = del.onlyDateFormat;
     
     for(UIView *subview in [pickerView subviews]) {
         [subview removeFromSuperview];
     }
-    CGRect rect = CGRectMake(pickerOffset, 0, pickerWidth, pickerView.bounds.size.height);
+    CGRect dateBoxRect = CGRectMake(dateBoxOffset, 2, dateBoxWidth, pickerView.bounds.size.height - 2); // width = 70
+    CGRect dateBoxTextRect = CGRectMake(dateBoxSeparatorWidth, 2, dateBoxTextWidth, pickerView.bounds.size.height - 2); // width = 66
+    CGRect dateBoxSeparatorRect = CGRectMake(0, 2, dateBoxSeparatorWidth, pickerView.bounds.size.height - 2); //width = 2
     int i;
     for(i = 0; i < sectListOfEvents.count; i++) {
         Event *e = [[[sectListOfEvents objectAtIndex:i] objectForKey:@"Events"] objectAtIndex:0];
-        UILabel *lbl = [[UILabel alloc] initWithFrame:rect];
-        lbl.font = [UIFont systemFontOfSize:12];
+        //Init colorlabelLeft (separator)
+        UILabel *colorLblLeft = [[UILabel alloc] initWithFrame:dateBoxSeparatorRect];
+        colorLblLeft.backgroundColor = [UIColor clearColor];
+        //[UIColor colorWithRed:0.490 green:0.647 blue:0.682 alpha:1.0]; iPhone Grå-blå
+        //[UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:0.5]; UKA-rød
+        
+        //Init colorlabelRight (separator)
+        dateBoxSeparatorRect.origin.x = (dateBoxWidth - dateBoxSeparatorWidth);
+        UILabel *colorLblRight = [[UILabel alloc] initWithFrame:dateBoxSeparatorRect];
+        colorLblRight.backgroundColor = [UIColor clearColor];
+        dateBoxSeparatorRect.origin.x = 0;
+        
+        //Init dateBox
+        UIView *dateBox = [[UIView alloc] initWithFrame:dateBoxRect];
+        dateBox.backgroundColor = [UIColor clearColor];
+        
+        //Add Textlabel
+        UILabel *lbl = [[UILabel alloc] initWithFrame:dateBoxTextRect];
+        lbl.font = [UIFont systemFontOfSize:13];
+        lbl.textColor = [UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:1.0];
+        lbl.backgroundColor = [UIColor colorWithRed:0.490 green:0.647 blue:0.682 alpha:0.2];
+        lbl.textAlignment = UITextAlignmentCenter;
         [lbl setNumberOfLines:2];
         [lbl setText:[NSString stringWithFormat:@"%@\n%@", [del getWeekDay:e.showingTime], [onlyDateFormat stringFromDate:e.showingTime]]];
-        [pickerView addSubview:lbl];
-        NSLog(@"Added picker %@", lbl.text);
-        //[lbl release];
-        rect.origin.x += pickerWidth;
+        
+        //First, add colorLblLeft...
+        [dateBox addSubview:colorLblLeft];
+        //..then add textLbl...
+        [dateBox addSubview:lbl];
+        //..and  add colorLbRight...
+        [dateBox addSubview:colorLblRight];
+        
+        [pickerView addSubview:dateBox];
+        
+        //Change the startposition of dateBoxRect before the next box is drawn
+        dateBoxRect.origin.x += dateBoxWidth;
     }
-    pickerView.contentSize = CGSizeMake(2*pickerOffset+i*pickerWidth, 1);
+    pickerView.contentSize = CGSizeMake(2 * dateBoxOffset + ( i * dateBoxWidth), 1);
     
+    [self.view addSubview:pickerView];
+    //place transparent image
+    UIImageView *bildeView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 42)];
+    UIImage *transImg = [UIImage imageNamed:@"datePickerTransparentLayer.png"];
+    [bildeView setImage:transImg];
+    bildeView.alpha = 0.6;
+    [self.view addSubview:bildeView];
+    [bildeView release];
 }
 
 /**
@@ -100,10 +148,6 @@ bool isUsingPicker = NO;
         [sectListOfEvents addObject:[NSDictionary dictionaryWithObject:events forKey:@"Events"]];
         [events release];
         [gregorian release];
-        //[sectListOfEvents release];
-        datePicker.minimumDate = [[listOfEvents objectAtIndex:0] showingTime];
-        datePicker.date = [[listOfEvents objectAtIndex:0] showingTime];
-        datePicker.maximumDate = [[listOfEvents objectAtIndex:[listOfEvents count]-1] showingTime];
     }
     [self createPickerDates];
     NSLog(@"Table updatet");
@@ -133,7 +177,6 @@ bool isUsingPicker = NO;
     
     [self setListOfEvents:[[con executeFetchRequest:request error:&error] mutableCopy]];
     [request release];
-    //[self setListOfEvents:array];
     [self updateTable];
 }
 
@@ -142,37 +185,30 @@ bool isUsingPicker = NO;
  */
 -(void)showAllEvents{
     [self showEventsWithPredicate:Nil];
-    //[filterButton setTitle:@"Alle" forState:UIControlStateNormal];
 }
 -(void)showFavoriteEvents{
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorites == %i", 1];
     [self showEventsWithPredicate:predicate];
-    
-    //[filterButton setTitle:@"Favoritt" forState:UIControlStateNormal];
 }
 -(void)showKonsertEvents
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"konsert"];
     [self showEventsWithPredicate:predicate];
-    //[filterButton setTitle:@"Konsert" forState:UIControlStateNormal];
 }
 -(void)showRevyEvents
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"revy-og-teater"];
     [self showEventsWithPredicate:predicate];
-    //[filterButton setTitle:@"Favoritt" forState:UIControlStateNormal];
 }
 -(void)showKursEvents
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"andelig-fode"];
     [self showEventsWithPredicate:predicate];
-    //[filterButton setTitle:@"Favoritt" forState:UIControlStateNormal];
 }
 -(void)showFestEvents
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"fest-og-moro"];
     [self showEventsWithPredicate:predicate];
-    //[filterButton setTitle:@"Favoritt" forState:UIControlStateNormal];
 }
 
 -(void) scrollToDate:(NSDate *)date animated: (BOOL)animated
@@ -195,27 +231,9 @@ bool isUsingPicker = NO;
     }
 }
 
-/*
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}*/
 
 - (void)dealloc
 {
-    /*
-    [self.eventDetailsViewController dealloc];
-    [self.listOfEvents dealloc];
-    [self.filterViewController dealloc];
-    [filterButton dealloc];
-    [sectListOfEvents dealloc];
-    [datePickButton dealloc];
-    [editAttendingButton dealloc];
-    [toolbar dealloc];*/
     [super dealloc];
 }
 
@@ -237,50 +255,16 @@ bool isUsingPicker = NO;
     [eTableView setDelegate:self];
     [eTableView setDataSource:self];
     [pickerView setDelegate:self];
-    
-    editAttending = NO;
     listOfEvents = [[NSMutableArray alloc] init];
-    [self.datePicker addTarget:self action:@selector(datePickChanged:) forControlEvents:UIControlEventValueChanged];
-    [self.datePicker addTarget:self action:@selector(datePickClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.datePicker setHidden:YES];
+
     self.navigationItem.title = @"Program";
-    filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    datePickButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    filterButton.frame = CGRectMake(-10, 0, 36, 31);
-    datePickButton.frame = CGRectMake(26, 0, 36, 31);
-    filterButton.tag = 3;
-    datePickButton.tag = 4;
-    [filterButton addTarget:self action:@selector(comboClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [datePickButton addTarget:self action:@selector(calClicked:) forControlEvents:UIControlEventTouchUpInside];
-    //[datePickButton setTitle:@"Dato" forState:UIControlStateNormal];
-    [filterButton setImage:[UIImage imageNamed:@"choose_button"] forState:UIControlStateNormal];
-    [datePickButton setImage:[UIImage imageNamed:@"calendar_button"] forState:UIControlStateNormal];
-    
-    toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 5, 62, 31)];
-    
-    editAttendingButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    editAttendingButton.frame = CGRectMake(62, 0, 36, 31);
-    //[editAttendingButton setTitle:@"edit" forState:UIControlStateNormal];
-    [editAttendingButton setImage:[UIImage imageNamed:@"delta_pressed"] forState:UIControlStateNormal];
-    [editAttendingButton addTarget:self action:@selector(editAttendingClicked:) forControlEvents:UIControlEventTouchUpInside];
-    editAttendingButton.tag = 5;
-    [editAttendingButton retain];
-    
-    [toolbar addSubview:filterButton];
-    [toolbar addSubview:datePickButton];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:toolbar];
-    
-    
-    [self setLoginButtons];
-}
-- (void)setLoginButtons
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate isLoggedIn]) {
-        [toolbar setFrame:CGRectMake(-10, 5, 98, 31)];
-        [toolbar addSubview:editAttendingButton];
-        NSLog(@"LA TIL ATTENDINGBUTTON");
-    }
+
+    UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Filter" 
+                                                                      style:UIBarButtonItemStylePlain
+                                                                     target:self 
+                                                                     action:@selector(comboClicked:)];
+	self.navigationItem.rightBarButtonItem = anotherButton;
+    [anotherButton release];
 }
 
 
@@ -292,15 +276,8 @@ bool isUsingPicker = NO;
     [filterButton release];
     [sectListOfEvents release];
     [datePickButton release];
-    [editAttendingButton release];
     [toolbar release];
-    
-    
-    //[sectListOfEvents release];
     [listOfEvents release];
-    //[filterButton release];
-    //[datePickButton release];
-    //[editAttendingButton release];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -315,35 +292,6 @@ bool isUsingPicker = NO;
     return topLeft;
 }
 
-- (void) datePickChanged:(id)sender
-{
-    BOOL scrollEnabled = [self.eTableView isScrollEnabled];
-    [self.eTableView setScrollEnabled:YES];
-    [self scrollToDate:[datePicker date] animated:NO];
-    [self.eTableView setScrollEnabled:scrollEnabled];
-    [self.datePicker setCenter:[self makeGoodPickerPosition]];
-}
-- (void) hideDatePicker
-{
-    [datePicker removeFromSuperview];
-    [self.datePicker setHidden:YES];
-    [self.eTableView setScrollEnabled:YES];
-}
-
-- (void)calClicked:(id)sender
-{
-    if ([self.datePicker isHidden]) {
-        [self.eTableView insertSubview:datePicker aboveSubview:self.parentViewController.view];
-        [self.datePicker setHidden:NO];
-        [self.eTableView setContentOffset:[self.eTableView contentOffset] animated:NO];
-        [self.datePicker setCenter:[self makeGoodPickerPosition]];
-        [self.eTableView setScrollEnabled:NO];
-    } else {
-        [self hideDatePicker];
-    }
-    
-}
-
 
 - (void)comboClicked:(id)sender
 {
@@ -351,17 +299,7 @@ bool isUsingPicker = NO;
     self.filterViewController = [[FilterViewController alloc] initWithNibName:@"FilterView" bundle:nil];
     [self.filterViewController setEventsTableViewController:self];
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [delegate.rootController pushViewController:filterViewController animated:YES];
-}
--(void)editAttendingClicked:(id)sender
-{
-    if (editAttending) {
-        editAttending = NO;
-        [editAttendingButton setImage:[UIImage imageNamed:@"delta_pressed"] forState:UIControlStateNormal];
-    } else {
-        editAttending = YES;
-        [editAttendingButton setImage:[UIImage imageNamed:@"delta"] forState:UIControlStateNormal];
-    }
+    [delegate.rootController presentModalViewController:filterViewController animated:YES];
 }
 
 
@@ -375,16 +313,11 @@ bool isUsingPicker = NO;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    //[filterButton setHidden:NO];
-    //[datePickButton setHidden:NO];
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    //[filterButton setHidden:YES];
-    //[datePickButton setHidden:YES];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -442,6 +375,7 @@ bool isUsingPicker = NO;
     }
 }
 
+#define CELL_ROW_HEIGHT 50
 
 /**
  *  returns a view for displaying each event in the table
@@ -449,7 +383,7 @@ bool isUsingPicker = NO;
 - (UITableViewCell *) getCellContentView:(NSString *)cellIdentifier 
 {
     UILabel *lblTemp;
-    UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, 300, 60) reuseIdentifier:cellIdentifier] autorelease];
+    UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, 300, CELL_ROW_HEIGHT) reuseIdentifier:cellIdentifier] autorelease];
     
     //Initialize Label with tag 1.
     lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 290, 20)];
@@ -458,34 +392,40 @@ bool isUsingPicker = NO;
     [lblTemp release];
     
     //Initialize Label with tag 2.
-    lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(15, 27, 185, 13)];
+    lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(12, 27, 200, 13)];
     lblTemp.tag = 2;
     lblTemp.font = [UIFont boldSystemFontOfSize:12];
-    lblTemp.textColor = [UIColor lightGrayColor];
+    lblTemp.textColor = [UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:0.7];
     [cell.contentView addSubview:lblTemp];
     [lblTemp release];
-    //Initialize attending label
-    lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(200, 27, 40, 13)];
+    lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(0 , 0, 6, CELL_ROW_HEIGHT )];
     lblTemp.tag = 4;
-    lblTemp.font = [UIFont boldSystemFontOfSize:12];
-    lblTemp.textColor = [UIColor colorWithRed:0.66f green:0.99f blue:0.65 alpha:1.0f];
+    lblTemp.backgroundColor = [UIColor lightGrayColor];
     [cell.contentView addSubview:lblTemp];
     [lblTemp release];
-    
-    
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(260, 5, delegate.checkedImage.size.width*2, delegate.checkedImage.size.height*2);;
-    button.tag = 3;
-    [button addTarget:self action:@selector(favoritesClicked:event:) forControlEvents:UIControlEventTouchUpInside];
-    
-    button.backgroundColor = [UIColor clearColor];
-    [cell.contentView addSubview:button];
     
     return cell;
 }
 
-
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIImageView *containerView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 21)] autorelease];
+    UILabel *headerLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 0, 300, 21)] autorelease];
+    //UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 30)];
+    UIImage *backImg = [UIImage imageNamed:@"tableRowHeader.png"];
+    [containerView setImage:backImg];
+    
+    headerLabel.text = [self tableView:tableView titleForHeaderInSection:section];
+    headerLabel.textColor = [UIColor whiteColor];
+    headerLabel.shadowColor = [UIColor blackColor];
+    headerLabel.shadowOffset = CGSizeMake(0, 1);
+    headerLabel.font = [UIFont boldSystemFontOfSize:16];
+    headerLabel.backgroundColor = [UIColor clearColor];
+    
+    [containerView addSubview:headerLabel];
+    
+    return containerView;
+}
 
 /**
  *  Displays events in the table
@@ -495,38 +435,21 @@ bool isUsingPicker = NO;
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    /*if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-    }*/
     if (cell == nil) {
         cell = [self getCellContentView:CellIdentifier];
     }
     
     // Configure the cell...
     UILabel *titleLabel = (UILabel *)[cell viewWithTag:1];
-    UILabel *dateLabel = (UILabel *)[cell viewWithTag:2];
-    UIButton *button = (UIButton *)[cell viewWithTag:3];
-    //Event *e = (Event *) [listOfEvents objectAtIndex:indexPath.row];
+    UILabel *extraLabel1 = (UILabel *)[cell viewWithTag:2];
+    UILabel *colorCodeLabel = (UILabel *)[cell viewWithTag:4];
     Event *e = (Event *) [[[sectListOfEvents objectAtIndex:indexPath.section] objectForKey:@"Events"] objectAtIndex:indexPath.row];
     
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    dateLabel.text = [NSString stringWithFormat:@"%@ - %@", [delegate.onlyTimeFormat stringFromDate:e.showingTime], e.placeString];
     titleLabel.text = e.title;
+    extraLabel1.text = [NSString stringWithFormat:@"%@ - kl.%@", e.placeString, [delegate.onlyTimeFormat stringFromDate:e.showingTime]];
     
-    if ([e.favorites intValue] > 0) {
-        [button setImage:delegate.checkedImage forState:UIControlStateNormal];
-    }
-    else {
-        [button setImage:delegate.uncheckedImage forState:UIControlStateNormal];
-    }
-    if ([delegate isLoggedIn] && [delegate isInMyEvents:e.id]) {
-        UILabel *attendLabel = (UILabel *)[cell viewWithTag:4];
-        attendLabel.text = @"Deltar";
-        //titleLabel.text = [NSString stringWithFormat:@"%@ - Attending", e.title];
-    } else {
-        UILabel *attendLabel = (UILabel *)[cell viewWithTag:4];
-        attendLabel.text = @"";
-    }
+    colorCodeLabel.backgroundColor = [delegate getColorForEventCategory:e.eventType];
     
     return cell;
 }
@@ -539,9 +462,11 @@ bool isUsingPicker = NO;
     NSString *s = [delegate.weekDays objectAtIndex:[[delegate.weekDayFormat stringFromDate:e.showingTime] intValue]];
     return [NSString stringWithFormat:@"%@ %@", s, [delegate.onlyDateFormat stringFromDate:e.showingTime]];
 }
-    
 
-
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return CELL_ROW_HEIGHT;
+}
 
 
 #pragma mark - Table view delegate
@@ -551,19 +476,29 @@ bool isUsingPicker = NO;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    if (![datePicker isHidden]) {
-        [self hideDatePicker];
-        [self.eTableView deselectRowAtIndexPath:indexPath animated:NO];
-    }
-    else if (!editAttending) {
-        eventDetailsViewController = [[EventDetailsViewController alloc] initWithNibName:@"EventDetailsView" bundle:nil];
-        eventDetailsViewController.event = (Event *) [[[sectListOfEvents objectAtIndex:indexPath.section] objectForKey:@"Events"] objectAtIndex:indexPath.row];
-        [delegate.rootController pushViewController:eventDetailsViewController animated:YES];
-    }
-    else {
-        [self.eTableView deselectRowAtIndexPath:indexPath animated:NO];
-        [delegate flipAttendStatus:[[[[sectListOfEvents objectAtIndex:indexPath.section] objectForKey:@"Events"] objectAtIndex:indexPath.row] id]];
-        [self.eTableView reloadData];
+    eventDetailsViewController = [[EventDetailsViewController alloc] initWithNibName:@"EventDetailsView" bundle:nil];
+    eventDetailsViewController.event = (Event *) [[[sectListOfEvents objectAtIndex:indexPath.section] objectForKey:@"Events"] objectAtIndex:indexPath.row];
+    [delegate.rootController pushViewController:eventDetailsViewController animated:YES];
+    [self.eTableView deselectRowAtIndexPath:indexPath animated:NO];
+}
+
+-(void)snapToPosition:(UIScrollView *)sView
+{
+    if (sView == pickerView){
+        int pos = 0;
+        for(pos = 0; pos < sectListOfEvents.count; pos++) {
+            if (sView.contentOffset.x >= (pos * dateBoxWidth) - (dateBoxWidth/2) && 
+                sView.contentOffset.x <= ((pos * dateBoxWidth) + (dateBoxWidth/2)) ) {
+                [pickerView setContentOffset:CGPointMake((pos * dateBoxWidth), 0) animated:YES];
+                break;
+            }
+        }
+    } else if (sView == eTableView) {
+        NSIndexPath *path = [eTableView indexPathForRowAtPoint:CGPointMake(10, sView.contentOffset.y + 22)];
+        if (path) {
+            eTableScrollIndex = [[NSNumber numberWithUnsignedInteger:[path section]] intValue];
+            [pickerView setContentOffset:CGPointMake((eTableScrollIndex * dateBoxWidth), 0) animated:YES];
+        } 
     }
 }
 
@@ -573,28 +508,34 @@ bool isUsingPicker = NO;
 - (void)scrollViewDidScroll:(UIScrollView *)sView
 {
     if (isUsingPicker && sView == pickerView) {
-        int pos = (sView.contentOffset.x * [sectListOfEvents count]) / (sView.contentSize.width - pickerOffset*2);//finds the section
+        int pos = (sView.contentOffset.x * [sectListOfEvents count]) / (sView.contentSize.width - dateBoxOffset * 2);//finds the section
         pos = MAX(0, pos);
         pos = MIN([sectListOfEvents count]-1, pos);
-        //NSLog(@"scrolling to %i, name %i", pos, [[NSNumber numberWithInteger:sView.tag] intValue]);
         NSIndexPath *path = [NSIndexPath indexPathForRow:0 inSection:pos];
         [eTableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
-    } else if (!isUsingPicker && sView == eTableView) {
-        int index = [[NSNumber numberWithUnsignedInteger:[[eTableView indexPathForRowAtPoint:CGPointMake(10, eTableView.contentOffset.y + 40)] section]] intValue];
-        //NSLog(@"Pos is %i", index);
-        [pickerView setContentOffset:CGPointMake(index*pickerWidth, 0) animated:YES];
-        
+    } 
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate) {
+        [self snapToPosition:scrollView];
+        NSLog(@"endDragging!");
     }
 }
-/*- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+
+-(void) scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    if (scrollView == pickerView) {
-        isUsingPicker = NO;
-        NSLog(@"Stopped using picker");
-    } else {
-        
+    if (!isUsingPicker && scrollView == eTableView) {
+        NSIndexPath *path = [eTableView indexPathForRowAtPoint:CGPointMake(10, eTableView.contentOffset.y + 22)];
+        if (path) {
+            eTableScrollIndex = [[NSNumber numberWithUnsignedInteger:[path section]] intValue];
+        } 
+        [pickerView setContentOffset:CGPointMake(eTableScrollIndex*dateBoxWidth, 0) animated:YES];
+    } else if (scrollView == pickerView) {
+        [self snapToPosition:scrollView];
     }
-}*/
+}
 
 /**
  * Sets what view user is scrolling in
@@ -603,10 +544,8 @@ bool isUsingPicker = NO;
 {
     if (scrollView == pickerView) {
         isUsingPicker = YES;
-        //NSLog(@"Started picker");
     } else {
         isUsingPicker = NO;
-        //NSLog(@"Stopped using picker");
     }
 }
 

@@ -7,13 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FBConnect.h"
-@class OAConsumer;
+
+@class Reachability;
 
 @interface UKEprogramAppDelegate : NSObject <UIApplicationDelegate> {
     IBOutlet UINavigationController * rootController;
     NSMutableData *eventResponseData;
-    //NSMutableData *loginResponseData;
     NSDateFormatter *dateFormat;
     NSDateFormatter *weekDayFormat;
     NSDateFormatter *onlyDateFormat;
@@ -21,12 +20,11 @@
     NSArray *weekDays;
     UIImage *checkedImage;
     UIImage *uncheckedImage;
-    Facebook *facebook;
-    //NSURLConnection *eventFillConnection;
-    //NSURLConnection *loginConnection;
     NSString *formattedToken;
-    OAConsumer *consumer;
-    NSMutableArray *myEvents;
+    
+    Reachability* hostReach;
+    Reachability* internetReach;
+    Reachability* wifiReach;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
@@ -38,10 +36,7 @@
 @property (retain) NSArray *weekDays;
 @property (retain) UIImage *checkedImage;
 @property (retain) UIImage *uncheckedImage;
-@property (nonatomic, retain) Facebook *facebook;
 @property (retain) NSString *formattedToken;
-@property (retain) OAConsumer *consumer;
-@property (retain) NSMutableArray *myEvents;
 
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
@@ -49,9 +44,6 @@
 
 - (void)saveContext;
 - (NSURL *)applicationDocumentsDirectory;
-- (void)loginBackend;
-- (BOOL)isInMyEvents:(NSNumber *)eid;
-- (void)flipAttendStatus:(NSNumber *)eventId;
-- (BOOL)isLoggedIn;
 - (NSString *)getWeekDay:(NSDate *)date;
+- (UIColor *) getColorForEventCategory:(NSString *)category;
 @end

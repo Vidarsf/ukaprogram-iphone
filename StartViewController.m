@@ -9,8 +9,6 @@
 #import "StartViewController.h"
 #import "UKEprogramAppDelegate.h"
 #import "EventsTableViewController.h"
-#import "Facebook.h"
-#import "SettingsViewController.h"
 #import "EventDetailsViewController.h"
 
 
@@ -20,10 +18,6 @@
 @synthesize artistButton;
 @synthesize favoritesButton;
 @synthesize eventsTableViewController;
-@synthesize settingsViewController;
-@synthesize fbLoginButton;
-@synthesize settingsButton;
-//UIImageView *titleImage;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -46,31 +40,6 @@
     
     // Release any cached data, images, etc that aren't in use.
 }
--(void)settingsClicked:(id)sender
-{
-    [settingsViewController release];
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    self.settingsViewController = [[SettingsViewController alloc] initWithNibName:@"SettingsView" bundle:nil];
-    [delegate.rootController pushViewController:settingsViewController animated:YES];
-
-}
-
--(void)facebookLogin:(id)sender
-{
-    [self loginFacebook];
-}
--(void)loginFacebook
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    Facebook *facebook = delegate.facebook;
-    [facebook authorize:nil delegate:self];
-}
-
--(void)facebookLogout:(id)sender
-{
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [delegate.facebook logout:self];
-}
 
 #pragma mark - View lifecycle
 
@@ -80,20 +49,6 @@
 {
 }
 */
-
-- (void)setLoggedIn:(bool)sessionValid {
-    if (!sessionValid) {
-        [fbLoginButton addTarget:self action:@selector(facebookLogin:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
-        [fbLoginButton setTitle:@"Logg på facebook" forState:UIControlStateNormal];
-        [settingsButton setHidden:YES];
-    } else {
-        [fbLoginButton addTarget:self action:@selector(facebookLogout:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
-        [fbLoginButton setTitle:@"Bytt facebookbruker" forState:UIControlStateNormal];
-        [settingsButton setHidden:NO];
-        UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-        [delegate loginBackend];
-    }
-}
 
 -(void)allEventsClicked:(id)sender {
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
@@ -122,11 +77,6 @@
     [allButton addTarget:self action:@selector(allEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     [favoritesButton addTarget:self action:@selector(favoriteEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     self.navigationItem.title = @"Hjem";
-    
-    
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    [self setLoggedIn: [delegate.facebook isSessionValid]];
-    [settingsButton addTarget:self action:@selector(settingsClicked:) forControlEvents:UIControlEventTouchDown];
 }
 
 
@@ -137,7 +87,6 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-    [settingsViewController release];
     [eventsTableViewController release];
 }
 
@@ -163,36 +112,15 @@
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [[delegate rootController] setNavigationBarHidden:NO];
 }
-- (void) notifyViews 
-{
-    NSLog(@"blabla %i", [self.navigationController.viewControllers count]);
-    if ([self.navigationController.viewControllers count] > 2) {
-        EventsTableViewController *etView = (EventsTableViewController *)[self.navigationController.viewControllers objectAtIndex:1];
-        EventDetailsViewController *edView = (EventDetailsViewController *)[self.navigationController.viewControllers objectAtIndex:2];
-        [etView setLoginButtons];
-        [edView setLoginButtons];
-    }
-}
-
-- (void) fbDidLogin {
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:[delegate.facebook accessToken] forKey:@"FBAccessTokenKey"];
-    [defaults setObject:[delegate.facebook expirationDate] forKey:@"FBExpirationDateKey"];
-    [defaults synchronize];
-    [self setLoggedIn: [delegate.facebook isSessionValid]];
-    [self notifyViews];
-}
-
--(void)fbDidLogout {
-    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:[delegate.facebook accessToken] forKey:@"FBAccessTokenKey"];
-    [defaults synchronize];
-    [self setLoggedIn: [delegate.facebook isSessionValid]];
-}
--(void)fbDidNotLogin:(BOOL)cancelled {
-    
-}
+//- (void) notifyViews 
+//{
+//    NSLog(@"blabla %i", [self.navigationController.viewControllers count]);
+//    if ([self.navigationController.viewControllers count] > 2) {
+//        EventsTableViewController *etView = (EventsTableViewController *)[self.navigationController.viewControllers objectAtIndex:1];
+//        EventDetailsViewController *edView = (EventDetailsViewController *)[self.navigationController.viewControllers objectAtIndex:2];
+//        [etView setLoginButtons];
+//        [edView setLoginButtons];
+//    }
+//}
 
 @end

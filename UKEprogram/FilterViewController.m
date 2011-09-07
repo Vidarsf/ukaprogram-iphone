@@ -54,38 +54,45 @@
 {
     [self.eventsTableViewController showAllEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) konsertClicked:(id)sender
 {
     [self.eventsTableViewController showKonsertEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) revyClicked:(id)sender
 {
     [self.eventsTableViewController showRevyEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) kursClicked:(id)sender
 {
     [self.eventsTableViewController showKursEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) festClicked:(id)sender
 {
     [self.eventsTableViewController showFestEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) favorittClicked:(id)sender
 {
     [self.eventsTableViewController showFavoriteEvents];
     [[self retain] autorelease];
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
+
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad

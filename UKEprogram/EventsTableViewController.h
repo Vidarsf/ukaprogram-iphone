@@ -12,7 +12,6 @@
 
 @interface EventsTableViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate> {
     IBOutlet UITableView *eventsTableView;
-    IBOutlet UIDatePicker *datePicker;
     IBOutlet UITableView *eTableView;
     IBOutlet UIScrollView *pickerView;
     NSMutableArray *listOfEvents;
@@ -23,7 +22,6 @@
 @property (nonatomic, retain) UIScrollView *pickerView;
 @property (nonatomic, retain) NSMutableArray *listOfEvents;
 @property (nonatomic, retain) EventDetailsViewController *eventDetailsViewController;
-@property (nonatomic, retain) UIDatePicker *datePicker;
 @property (nonatomic, retain) FilterViewController *filterViewController;
 @property (nonatomic, retain) UITableView *eTableView;
 
@@ -34,5 +32,4 @@
 -(void) showKursEvents;
 -(void) showFestEvents;
 -(void) scrollToDate:(NSDate *)date animated:(BOOL)animated;
--(void) setLoginButtons;
 @end
