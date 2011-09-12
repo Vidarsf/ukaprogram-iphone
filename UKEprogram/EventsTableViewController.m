@@ -20,6 +20,7 @@
 @synthesize filterViewController;
 @synthesize eTableView;
 @synthesize pickerView;
+@synthesize categoryChooser;
 UIButton *filterButton;
 UIButton *datePickButton;
 UIToolbar *toolbar;
@@ -65,23 +66,23 @@ bool isUsingPicker = NO;
     for(i = 0; i < sectListOfEvents.count; i++) {
         Event *e = [[[sectListOfEvents objectAtIndex:i] objectForKey:@"Events"] objectAtIndex:0];
         //Init colorlabelLeft (separator)
-        UILabel *colorLblLeft = [[UILabel alloc] initWithFrame:dateBoxSeparatorRect];
+        UILabel *colorLblLeft = [[[UILabel alloc] initWithFrame:dateBoxSeparatorRect] autorelease];
         colorLblLeft.backgroundColor = [UIColor clearColor];
         //[UIColor colorWithRed:0.490 green:0.647 blue:0.682 alpha:1.0]; iPhone Grå-blå
         //[UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:0.5]; UKA-rød
         
         //Init colorlabelRight (separator)
         dateBoxSeparatorRect.origin.x = (dateBoxWidth - dateBoxSeparatorWidth);
-        UILabel *colorLblRight = [[UILabel alloc] initWithFrame:dateBoxSeparatorRect];
+        UILabel *colorLblRight = [[[UILabel alloc] initWithFrame:dateBoxSeparatorRect] autorelease];
         colorLblRight.backgroundColor = [UIColor clearColor];
         dateBoxSeparatorRect.origin.x = 0;
         
         //Init dateBox
-        UIView *dateBox = [[UIView alloc] initWithFrame:dateBoxRect];
+        UIView *dateBox = [[[UIView alloc] initWithFrame:dateBoxRect] autorelease];
         dateBox.backgroundColor = [UIColor clearColor];
         
         //Add Textlabel
-        UILabel *lbl = [[UILabel alloc] initWithFrame:dateBoxTextRect];
+        UILabel *lbl = [[[UILabel alloc] initWithFrame:dateBoxTextRect] autorelease];
         lbl.font = [UIFont systemFontOfSize:13];
         lbl.textColor = [UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:1.0];
         lbl.backgroundColor = [UIColor colorWithRed:0.490 green:0.647 blue:0.682 alpha:0.2];
@@ -118,7 +119,6 @@ bool isUsingPicker = NO;
  */
 -(void)updateTable {
     //sort by starting date
-    NSLog(@"Updating table");
     [sectListOfEvents release];
     sectListOfEvents = [[NSMutableArray alloc] init];
     if ([listOfEvents count] > 0) {
@@ -150,7 +150,6 @@ bool isUsingPicker = NO;
         [gregorian release];
     }
     [self createPickerDates];
-    NSLog(@"Table updatet");
     [eTableView reloadData];
     
     
@@ -166,16 +165,16 @@ bool isUsingPicker = NO;
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"showingTime" ascending:YES];
-    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-    [request setSortDescriptors:sortDescriptors];
+    [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
     [sortDescriptor release];
-    
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Event" inManagedObjectContext:con];
     [request setEntity:entity];
     [request setPredicate:predicate];
+
+    //[self setListOfEvents:[[con executeFetchRequest:request error:&error] ©mutableCopy]];
+    self.listOfEvents = [[[con executeFetchRequest:request error:&error] mutableCopy] autorelease];
     
-    [self setListOfEvents:[[con executeFetchRequest:request error:&error] mutableCopy]];
     [request release];
     [self updateTable];
 }
@@ -184,9 +183,11 @@ bool isUsingPicker = NO;
  *   Fetches all the events in the object context and displays them
  */
 -(void)showAllEvents{
+    self.navigationItem.rightBarButtonItem = categoryChooser;
     [self showEventsWithPredicate:Nil];
 }
 -(void)showFavoriteEvents{
+    self.navigationItem.rightBarButtonItem = nil;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"favorites == %i", 1];
     [self showEventsWithPredicate:predicate];
 }
@@ -222,7 +223,6 @@ bool isUsingPicker = NO;
             if (((long)[e.showingTime  timeIntervalSinceDate:date]) > 0 && !found) {
                 scrollPath = [NSIndexPath indexPathForRow:j inSection:i];
                 found = YES;
-                NSLog(@"Scroller til %@", e.title);
             }
         }
     }
@@ -234,6 +234,7 @@ bool isUsingPicker = NO;
 
 - (void)dealloc
 {
+    [categoryChooser release];
     [super dealloc];
 }
 
@@ -259,25 +260,22 @@ bool isUsingPicker = NO;
 
     self.navigationItem.title = @"Program";
 
-    UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Filter" 
+    categoryChooser = [[UIBarButtonItem alloc] initWithTitle:@"Kategori" 
                                                                       style:UIBarButtonItemStylePlain
                                                                      target:self 
                                                                      action:@selector(comboClicked:)];
-	self.navigationItem.rightBarButtonItem = anotherButton;
-    [anotherButton release];
 }
 
 
 - (void)viewDidUnload
 {
-    [self.eventDetailsViewController release];
-    [self.listOfEvents release];
-    [self.filterViewController release];
+    [eventDetailsViewController release];
+    [listOfEvents release];
+    [filterViewController release];
     [filterButton release];
     [sectListOfEvents release];
     [datePickButton release];
     [toolbar release];
-    [listOfEvents release];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -368,9 +366,9 @@ bool isUsingPicker = NO;
             [button setImage:delegate.checkedImage forState:UIControlStateNormal];
         }
         if (![con save:&error]) {
-            NSLog(@"Lagring av %@ feilet", e.title);
+            //NSLog(@"Lagring av %@ feilet", e.title);
         } else {
-            NSLog(@"Lagret event %@", e.title);
+            //NSLog(@"Lagret event %@", e.title);
         }
     }
 }
@@ -398,11 +396,16 @@ bool isUsingPicker = NO;
     lblTemp.textColor = [UIColor colorWithRed:0.6 green:0.113 blue:0.125 alpha:0.7];
     [cell.contentView addSubview:lblTemp];
     [lblTemp release];
+    
+    //Initialize Label with tag 4.
     lblTemp = [[UILabel alloc] initWithFrame:CGRectMake(0 , 0, 6, CELL_ROW_HEIGHT )];
     lblTemp.tag = 4;
     lblTemp.backgroundColor = [UIColor lightGrayColor];
     [cell.contentView addSubview:lblTemp];
     [lblTemp release];
+    
+    //Add DisclosureIndicator
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     return cell;
 }
@@ -520,7 +523,6 @@ bool isUsingPicker = NO;
 {
     if (!decelerate) {
         [self snapToPosition:scrollView];
-        NSLog(@"endDragging!");
     }
 }
 

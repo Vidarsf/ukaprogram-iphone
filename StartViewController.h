@@ -14,11 +14,15 @@
     IBOutlet UIButton *artistButton;
     IBOutlet UIButton *favoritesButton;
     IBOutlet EventsTableViewController *eventsTableViewController;
+    IBOutlet UIActivityIndicatorView *activityView;
+    IBOutlet UILabel *activityLabel;
     
 }
 @property (nonatomic, retain) UIButton *allButton;
 @property (nonatomic, retain) UIButton *artistButton;
 @property (nonatomic, retain) UIButton *favoritesButton;
 @property (nonatomic, retain) EventsTableViewController *eventsTableViewController;
+@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *activityView;
+@property (nonatomic, retain) IBOutlet UILabel *activityLabel;
 
 @end

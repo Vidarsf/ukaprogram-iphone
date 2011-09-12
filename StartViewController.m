@@ -10,6 +10,7 @@
 #import "UKEprogramAppDelegate.h"
 #import "EventsTableViewController.h"
 #import "EventDetailsViewController.h"
+#import "Reachability.h"
 
 
 @implementation StartViewController
@@ -18,6 +19,8 @@
 @synthesize artistButton;
 @synthesize favoritesButton;
 @synthesize eventsTableViewController;
+@synthesize activityView;
+@synthesize activityLabel;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,6 +33,7 @@
 
 - (void)dealloc
 {
+    [self.eventsTableViewController release];
     [super dealloc];
 }
 
@@ -41,6 +45,19 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+
+-(void)stopActivityIndication:(NSNotification *)notification
+{
+    [activityView stopAnimating];
+    [activityView setHidden:YES];
+    [activityLabel setHidden:YES];
+}
+-(void)startActivityIndication:(NSNotification *)notification
+{
+    [activityView startAnimating];
+    [activityView setHidden:NO];
+    [activityLabel setHidden:NO];
+}
 #pragma mark - View lifecycle
 
 /*
@@ -52,35 +69,33 @@
 
 -(void)allEventsClicked:(id)sender {
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    self.eventsTableViewController = [[EventsTableViewController alloc] initWithNibName:@"EventsTableView" bundle:nil];
     [delegate.rootController pushViewController:eventsTableViewController animated:YES];
     [eventsTableViewController showAllEvents];
     NSDate *now = [[NSDate alloc] init];
     [eventsTableViewController scrollToDate:now animated:YES];
-    [now dealloc];
+    [now release];
 }
 -(void)favoriteEventsClicked:(id)sender {
-    self.eventsTableViewController = [[EventsTableViewController alloc] initWithNibName:@"EventsTableView" bundle:nil];
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [delegate.rootController pushViewController:eventsTableViewController animated:YES];
     [eventsTableViewController showFavoriteEvents];
     NSDate *now = [[NSDate alloc] init];
     [eventsTableViewController scrollToDate:now animated:YES];
-    [now dealloc];
+    [now release];
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-    NSLog(@"Loading startupView");
     [super viewDidLoad];
     [allButton addTarget:self action:@selector(allEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     [favoritesButton addTarget:self action:@selector(favoriteEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     self.navigationItem.title = @"Hjem";
+    [activityView startAnimating];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopActivityIndication:) name:@"stopActivityIndication" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startActivityIndication:) name:@"startActivityIndication" object:nil];
+    self.eventsTableViewController = [[EventsTableViewController alloc] initWithNibName:@"EventsTableView" bundle:nil];
 }
-
-
-
 
 - (void)viewDidUnload
 {
@@ -104,6 +119,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    Reachability *r = [Reachability reachabilityForInternetConnection];
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if(internetStatus == NotReachable) {
+        [self stopActivityIndication:nil];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -112,15 +132,5 @@
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [[delegate rootController] setNavigationBarHidden:NO];
 }
-//- (void) notifyViews 
-//{
-//    NSLog(@"blabla %i", [self.navigationController.viewControllers count]);
-//    if ([self.navigationController.viewControllers count] > 2) {
-//        EventsTableViewController *etView = (EventsTableViewController *)[self.navigationController.viewControllers objectAtIndex:1];
-//        EventDetailsViewController *edView = (EventDetailsViewController *)[self.navigationController.viewControllers objectAtIndex:2];
-//        [etView setLoginButtons];
-//        [edView setLoginButtons];
-//    }
-//}
 
 @end

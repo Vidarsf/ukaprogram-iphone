@@ -17,7 +17,6 @@
 @synthesize revyButton;
 @synthesize kursButton;
 @synthesize festButton;
-@synthesize favorittButton;
 @synthesize eventsTableViewController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -53,44 +52,27 @@
 - (void) alleClicked:(id)sender
 {
     [self.eventsTableViewController showAllEvents];
-    [[self retain] autorelease];
     [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) konsertClicked:(id)sender
 {
     [self.eventsTableViewController showKonsertEvents];
-    [[self retain] autorelease];
     [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) revyClicked:(id)sender
 {
     [self.eventsTableViewController showRevyEvents];
-    [[self retain] autorelease];
     [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) kursClicked:(id)sender
 {
     [self.eventsTableViewController showKursEvents];
-    [[self retain] autorelease];
     [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void) festClicked:(id)sender
 {
     [self.eventsTableViewController showFestEvents];
-    [[self retain] autorelease];
     [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
-}
-- (void) favorittClicked:(id)sender
-{
-    [self.eventsTableViewController showFavoriteEvents];
-    [[self retain] autorelease];
-    [self dismissModalViewControllerAnimated:YES];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 
 
@@ -104,14 +86,17 @@
     [revyButton addTarget:self action:@selector(revyClicked:) forControlEvents:UIControlEventTouchUpInside];
     [kursButton addTarget:self action:@selector(kursClicked:) forControlEvents:UIControlEventTouchUpInside];
     [festButton addTarget:self action:@selector(festClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [favorittButton addTarget:self action:@selector(favorittClicked:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    [alleButton release];
+    [konsertButton release];
+    [revyButton release];
+    [kursButton release];
+    [festButton release];
+    [eventsTableViewController release];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

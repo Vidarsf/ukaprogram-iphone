@@ -99,20 +99,20 @@ IBOutlet UIImage *eventImg;
     labelSize = [event.lead sizeWithFont:leadLabel.font constrainedToSize:constraintSize lineBreakMode:UILineBreakModeWordWrap];
     CGFloat leadHeight = labelSize.height;
     //Set the lead and text labels to the size found
-    [leadLabel setFrame:CGRectMake(11, 275, 300, leadHeight)];
-    [textLabel setFrame:CGRectMake(11, 290 + leadHeight, 300, textHeight)];
-
+    [leadLabel setFrame:CGRectMake(leadLabel.frame.origin.x, leadLabel.frame.origin.y, 305, leadHeight)];
+    [textLabel setFrame:CGRectMake(textLabel.frame.origin.x, textLabel.frame.origin.y + leadHeight, 305, textHeight)];
+    
     sView = (UIScrollView *) self.view;
-    sView.contentSize=CGSizeMake(1, leadHeight + textHeight + 290);//1 is less than width of iphone
+    sView.contentSize=CGSizeMake(1, textHeight + leadHeight + leadLabel.frame.origin.y + 50);//1 is less than width of iphone
     
     favButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    favButton.frame = CGRectMake(0, 0, delegate.checkedImage.size.width*2, delegate.checkedImage.size.height*2);
+    favButton.frame = CGRectMake(0, 0, 40, 40);
     [favButton addTarget:self action:@selector(favoritesClicked:) forControlEvents:UIControlEventTouchUpInside];
     if ([event.favorites intValue] > 0) {
-        [favButton setImage:delegate.checkedImage forState:UIControlStateNormal];
+        [favButton setImage:[UIImage imageNamed:@"favorite.png"] forState:UIControlStateNormal];
     }
     else {
-       [favButton setImage:delegate.uncheckedImage forState:UIControlStateNormal];
+       [favButton setImage:[UIImage imageNamed:@"unfavorite.png"] forState:UIControlStateNormal];
     }
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:favButton] autorelease];
     
@@ -214,6 +214,7 @@ IBOutlet UIImage *eventImg;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+    [sView setNeedsLayout];
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait || 
             interfaceOrientation == UIInterfaceOrientationLandscapeRight || 

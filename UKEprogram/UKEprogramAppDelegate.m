@@ -10,6 +10,7 @@
 #import "Event.h"
 #import "JSON.h"
 #import "Reachability.h"
+#import "StartViewController.h"
 
 @implementation UKEprogramAppDelegate
 
@@ -29,6 +30,7 @@
 @synthesize formattedToken;
 
 @synthesize persistentStoreCoordinator=__persistentStoreCoordinator;
+NSURLConnection *nsuc;
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
@@ -41,17 +43,16 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError: (NSError *)error {
 }
+
 /**
  * Request to uka backend to retrieve all events
  */
 - (void)getAllEvents {
     NSString *eventsApiUrl = [NSString stringWithFormat: @"http://findmyapp.net/findmyapp/program/uka11/events"];
-    //NSString *eventsApiUrl = [NSString stringWithFormat: @"http://170.251.113.99:8080/findmyapp/program/uka11/events"];
     eventResponseData = [[NSMutableData data] retain];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: [NSURL URLWithString:eventsApiUrl]];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    NSLog(@"Opening connection");
-    [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    nsuc = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 
 - (void)fillEvents {
@@ -102,28 +103,25 @@
         e.thumbnail = [event objectForKey:@"thumbnail"];
         e.ageLimit = [numberFormat numberFromString:[[event objectForKey:@"ageLimit"] stringValue]];
         if (![con save:&error]) {
-            NSLog(@"Lagring av %@ feilet", e.title);
+            //NSLog(@"Lagring av %@ feilet", e.title);
         } else {
             //NSLog(@"Lagret event %@", e.title);
         }
     }
     [numberFormat release];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopActivityIndication" object:nil];
 }
 
 - (UIColor *) getColorForEventCategory:(NSString *)category
 {
     UIColor *color;
     if ([category isEqualToString:@"konsert"]) {
-        color = [UIColor purpleColor];
         color = [UIColor colorWithRed:0.686 green:0.576 blue:0.776 alpha:1.0];
     } else if ([category isEqualToString:@"revy-og-teater"]) {
-        color = [UIColor orangeColor];
         color = [UIColor colorWithRed:0.976 green:0.717 blue:0.545 alpha:1.0];
     } else if ([category isEqualToString:@"andelig-fode"]) {
-        color = [UIColor cyanColor];
         color = [UIColor colorWithRed:0.5 green:0.854 blue:0.898 alpha:1.0];
     } else if ([category isEqualToString:@"fest-og-moro"]) {
-        color = [UIColor magentaColor];
         color = [UIColor colorWithRed:0.92 green:0.698 blue:0.827 alpha:1.0];
     } else {
         color = [UIColor lightGrayColor];
@@ -157,6 +155,7 @@
 		[alert release];
         [melding release];
     } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startActivityIndication" object:nil];
         [self getAllEvents];
     }
 }
@@ -167,14 +166,14 @@
     [self.window addSubview:rootController.view];
     dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm"];
-    [self checkReachability];
+    //[self checkReachability];
     
     // Override point for customization after application launch.
     [self.window makeKeyAndVisible];
     
-    
     weekDayFormat = [[NSDateFormatter alloc] init];
     [weekDayFormat setDateFormat:@"e"];
+    
     onlyDateFormat = [[NSDateFormatter alloc] init];
     [onlyDateFormat setDateFormat:@"dd.MM"];
     onlyTimeFormat  = [[NSDateFormatter alloc] init];
@@ -213,6 +212,7 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    [self checkReachability];
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
@@ -233,6 +233,7 @@
     [__managedObjectContext release];
     [__managedObjectModel release];
     [__persistentStoreCoordinator release];
+    [nsuc release];
     // Saves changes in the application's managed object context before the application terminates.
     [self saveContext];
 }

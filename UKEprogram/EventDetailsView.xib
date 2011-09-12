@@ -58,11 +58,15 @@
 								<reference key="NSNextKeyView" ref="448788691"/>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+								<object class="NSCustomResource" key="IBUIImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">placeHolderImage.png</string>
+								</object>
 							</object>
 							<object class="IBUILabel" id="622096835">
 								<reference key="NSNextResponder" ref="533559474"/>
 								<int key="NSvFlags">290</int>
-								<string key="NSFrame">{{8, 257}, {305, 31}}</string>
+								<string key="NSFrame">{{7, 257}, {305, 31}}</string>
 								<reference key="NSSuperview" ref="533559474"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="539285789"/>
@@ -94,7 +98,7 @@
 							<object class="IBUILabel" id="539285789">
 								<reference key="NSNextResponder" ref="533559474"/>
 								<int key="NSvFlags">290</int>
-								<string key="NSFrame">{{8, 332}, {357, 92}}</string>
+								<string key="NSFrame">{{7, 296}, {305, 60}}</string>
 								<reference key="NSSuperview" ref="533559474"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView"/>
@@ -163,7 +167,7 @@
 								<int key="IBUIContentMode">7</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">Label</string>
+								<string key="IBUIText">Footer</string>
 								<reference key="IBUIFont" ref="335405100"/>
 								<reference key="IBUITextColor" ref="657455027"/>
 								<nil key="IBUIHighlightedColor"/>
@@ -287,9 +291,9 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="544856050"/>
 							<reference ref="884885286"/>
-							<reference ref="539285789"/>
 							<reference ref="448788691"/>
 							<reference ref="622096835"/>
+							<reference ref="539285789"/>
 						</object>
 						<reference key="parent" ref="191373211"/>
 						<string key="objectName">Scroll View</string>
@@ -453,6 +457,10 @@
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="NS.key.0">placeHolderImage.png</string>
+			<string key="NS.object.0">{305, 175}</string>
+		</object>
 		<string key="IBCocoaTouchPluginVersion">301</string>
 	</data>
 </archive>

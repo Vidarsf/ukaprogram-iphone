@@ -15,7 +15,6 @@
     IBOutlet UIButton *revyButton;
     IBOutlet UIButton *kursButton;
     IBOutlet UIButton *festButton;
-    IBOutlet UIButton *favorittButton;
     EventsTableViewController *eventsTableViewController;
 }
 
@@ -24,7 +23,6 @@
 @property (retain) IBOutlet UIButton *revyButton;
 @property (retain) IBOutlet UIButton *kursButton;
 @property (retain) IBOutlet UIButton *festButton;
-@property (retain) IBOutlet UIButton *favorittButton;
 @property (nonatomic, retain) EventsTableViewController *eventsTableViewController;
 
 

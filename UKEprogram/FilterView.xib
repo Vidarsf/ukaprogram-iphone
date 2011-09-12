@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1056</int>
-		<string key="IBDocument.SystemVersion">10K540</string>
+		<string key="IBDocument.SystemVersion">10K549</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
 		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
@@ -43,10 +43,23 @@
 				<int key="NSvFlags">274</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<object class="IBUIImageView" id="540147980">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">292</int>
+						<string key="NSFrameSize">{320, 460}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
+						<bool key="IBUIUserInteractionEnabled">NO</bool>
+						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+						<object class="NSCustomResource" key="IBUIImage">
+							<string key="NSClassName">NSImage</string>
+							<string key="NSResourceName">diagonalStripesBackground.png</string>
+						</object>
+					</object>
 					<object class="IBUIButton" id="604603172">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 71}, {213, 50}}</string>
+						<string key="NSFrame">{{70, 94}, {180, 50}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="250909605"/>
@@ -54,20 +67,21 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
-						<object class="NSFont" key="IBUIFont" id="979303926">
+						<object class="NSFont" key="IBUIFont" id="317405478">
 							<string key="NSName">Helvetica-Bold</string>
-							<double key="NSSize">15</double>
+							<double key="NSSize">17</double>
 							<int key="NSfFlags">16</int>
 						</object>
+						<string key="IBUITitleShadowOffset">{1, 1}</string>
 						<string key="IBUINormalTitle">Alle</string>
 						<object class="NSColor" key="IBUIHighlightedTitleColor" id="245605724">
 							<int key="NSColorSpace">3</int>
 							<bytes key="NSWhite">MQA</bytes>
 						</object>
 						<reference key="IBUINormalTitleColor" ref="245605724"/>
-						<object class="NSColor" key="IBUINormalTitleShadowColor" id="513872823">
+						<object class="NSColor" key="IBUINormalTitleShadowColor" id="470145541">
 							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MC41AA</bytes>
+							<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
 						</object>
 						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 							<string key="NSClassName">NSImage</string>
@@ -77,7 +91,7 @@
 					<object class="IBUIButton" id="250909605">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 129}, {213, 50}}</string>
+						<string key="NSFrame">{{70, 162}, {180, 50}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="557953075"/>
@@ -85,11 +99,12 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
-						<reference key="IBUIFont" ref="979303926"/>
+						<reference key="IBUIFont" ref="317405478"/>
+						<string key="IBUITitleShadowOffset">{1, 1}</string>
 						<string key="IBUINormalTitle">Konsert</string>
 						<reference key="IBUIHighlightedTitleColor" ref="245605724"/>
 						<reference key="IBUINormalTitleColor" ref="245605724"/>
-						<reference key="IBUINormalTitleShadowColor" ref="513872823"/>
+						<reference key="IBUINormalTitleShadowColor" ref="470145541"/>
 						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">katbutton3dkonsert.png</string>
@@ -98,7 +113,7 @@
 					<object class="IBUIButton" id="557953075">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 187}, {214, 50}}</string>
+						<string key="NSFrame">{{70, 230}, {180, 50}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="951530304"/>
@@ -106,11 +121,12 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
-						<reference key="IBUIFont" ref="979303926"/>
+						<reference key="IBUIFont" ref="317405478"/>
+						<string key="IBUITitleShadowOffset">{1, 1}</string>
 						<string key="IBUINormalTitle">Revy og teater</string>
 						<reference key="IBUIHighlightedTitleColor" ref="245605724"/>
 						<reference key="IBUINormalTitleColor" ref="245605724"/>
-						<reference key="IBUINormalTitleShadowColor" ref="513872823"/>
+						<reference key="IBUINormalTitleShadowColor" ref="470145541"/>
 						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">katbutton3drevy.png</string>
@@ -119,7 +135,7 @@
 					<object class="IBUIButton" id="951530304">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 245}, {213, 50}}</string>
+						<string key="NSFrame">{{70, 298}, {180, 50}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="51659919"/>
@@ -127,11 +143,12 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
-						<reference key="IBUIFont" ref="979303926"/>
+						<reference key="IBUIFont" ref="317405478"/>
+						<string key="IBUITitleShadowOffset">{1, 1}</string>
 						<string key="IBUINormalTitle">Kurs og events</string>
 						<reference key="IBUIHighlightedTitleColor" ref="245605724"/>
 						<reference key="IBUINormalTitleColor" ref="245605724"/>
-						<reference key="IBUINormalTitleShadowColor" ref="513872823"/>
+						<reference key="IBUINormalTitleShadowColor" ref="470145541"/>
 						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">katbutton3dkurs.png</string>
@@ -140,46 +157,22 @@
 					<object class="IBUIButton" id="51659919">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 303}, {213, 50}}</string>
+						<string key="NSFrame">{{70, 366}, {180, 50}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="320709172"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
-						<reference key="IBUIFont" ref="979303926"/>
+						<reference key="IBUIFont" ref="317405478"/>
+						<string key="IBUITitleShadowOffset">{1, 1}</string>
 						<string key="IBUINormalTitle">Fest og moro</string>
 						<reference key="IBUIHighlightedTitleColor" ref="245605724"/>
 						<reference key="IBUINormalTitleColor" ref="245605724"/>
-						<reference key="IBUINormalTitleShadowColor" ref="513872823"/>
+						<reference key="IBUINormalTitleShadowColor" ref="470145541"/>
 						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">katbutton3dfest.png</string>
-						</object>
-					</object>
-					<object class="IBUIButton" id="320709172">
-						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{53, 361}, {213, 50}}</string>
-						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
-						<bool key="IBUIOpaque">NO</bool>
-						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-						<int key="IBUIContentHorizontalAlignment">0</int>
-						<int key="IBUIContentVerticalAlignment">0</int>
-						<reference key="IBUIFont" ref="979303926"/>
-						<string key="IBUINormalTitle">Favoritter</string>
-						<reference key="IBUIHighlightedTitleColor" ref="245605724"/>
-						<object class="NSColor" key="IBUINormalTitleColor">
-							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
-						</object>
-						<reference key="IBUINormalTitleShadowColor" ref="513872823"/>
-						<object class="NSCustomResource" key="IBUINormalBackgroundImage">
-							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">mainbuttonfav.png</string>
 						</object>
 					</object>
 					<object class="IBUIImageView" id="694472560">
@@ -233,14 +226,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">favorittButton</string>
-						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="320709172"/>
-					</object>
-					<int key="connectionID">13</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">festButton</string>
 						<reference key="source" ref="372490531"/>
 						<reference key="destination" ref="51659919"/>
@@ -286,13 +271,13 @@
 						<reference key="object" ref="191373211"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="694472560"/>
 							<reference ref="604603172"/>
 							<reference ref="250909605"/>
 							<reference ref="557953075"/>
 							<reference ref="951530304"/>
-							<reference ref="320709172"/>
-							<reference ref="694472560"/>
 							<reference ref="51659919"/>
+							<reference ref="540147980"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -333,13 +318,13 @@
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">9</int>
-						<reference key="object" ref="320709172"/>
+						<int key="objectID">18</int>
+						<reference key="object" ref="694472560"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">18</int>
-						<reference key="object" ref="694472560"/>
+						<int key="objectID">20</int>
+						<reference key="object" ref="540147980"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
 				</object>
@@ -353,12 +338,12 @@
 					<string>1.IBEditorWindowLastContentRect</string>
 					<string>1.IBPluginDependency</string>
 					<string>18.IBPluginDependency</string>
+					<string>20.IBPluginDependency</string>
 					<string>4.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>6.IBPluginDependency</string>
 					<string>7.IBPluginDependency</string>
 					<string>8.IBPluginDependency</string>
-					<string>9.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -387,7 +372,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">18</int>
+			<int key="maxID">20</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -400,7 +385,6 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>alleButton</string>
-							<string>favorittButton</string>
 							<string>festButton</string>
 							<string>konsertButton</string>
 							<string>kursButton</string>
@@ -408,7 +392,6 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>
@@ -421,7 +404,6 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>alleButton</string>
-							<string>favorittButton</string>
 							<string>festButton</string>
 							<string>konsertButton</string>
 							<string>kursButton</string>
@@ -431,10 +413,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">alleButton</string>
-								<string key="candidateClassName">UIButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">favorittButton</string>
 								<string key="candidateClassName">UIButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -474,22 +452,22 @@
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>diagonalStripesBackground.png</string>
 				<string>katbutton3dalle.png</string>
 				<string>katbutton3dfest.png</string>
 				<string>katbutton3dkonsert.png</string>
 				<string>katbutton3dkurs.png</string>
 				<string>katbutton3drevy.png</string>
-				<string>mainbuttonfav.png</string>
 				<string>mainlogo.png</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>{215, 52}</string>
-				<string>{213, 50}</string>
-				<string>{213, 50}</string>
-				<string>{213, 52}</string>
-				<string>{215, 52}</string>
-				<string>{168, 39}</string>
+				<string>{640, 960}</string>
+				<string>{360, 100}</string>
+				<string>{360, 100}</string>
+				<string>{360, 100}</string>
+				<string>{360, 100}</string>
+				<string>{360, 100}</string>
 				<string>{236, 40}</string>
 			</object>
 		</object>
