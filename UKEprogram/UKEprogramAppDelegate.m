@@ -114,14 +114,17 @@ NSURLConnection *nsuc;
 
 - (UIColor *) getColorForEventCategory:(NSString *)category
 {
+    NSLog(@"Kategori: %@", category);
     UIColor *color;
-    if ([category isEqualToString:@"konsert"]) {
+    if ([category isEqualToString:@"Konsert"]) {
         color = [UIColor colorWithRed:0.686 green:0.576 blue:0.776 alpha:1.0];
-    } else if ([category isEqualToString:@"revy-og-teater"]) {
+    } else if ([category isEqualToString:@"Revy og teater"]) {
         color = [UIColor colorWithRed:0.976 green:0.717 blue:0.545 alpha:1.0];
-    } else if ([category isEqualToString:@"andelig-fode"]) {
+    } else if ([category isEqualToString:@"Andelig fode"]) {
         color = [UIColor colorWithRed:0.5 green:0.854 blue:0.898 alpha:1.0];
-    } else if ([category isEqualToString:@"fest-og-moro"]) {
+    } else if ([category isEqualToString:@"Kurs og events"]) {
+        color = [UIColor colorWithRed:0.5 green:0.854 blue:0.898 alpha:1.0];
+    } else if ([category isEqualToString:@"Fest og moro"]) {
         color = [UIColor colorWithRed:0.92 green:0.698 blue:0.827 alpha:1.0];
     } else {
         color = [UIColor lightGrayColor];

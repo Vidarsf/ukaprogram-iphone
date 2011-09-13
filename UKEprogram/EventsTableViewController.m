@@ -193,22 +193,22 @@ bool isUsingPicker = NO;
 }
 -(void)showKonsertEvents
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"konsert"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"Konsert"];
     [self showEventsWithPredicate:predicate];
 }
 -(void)showRevyEvents
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"revy-og-teater"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"Revy og teater"];
     [self showEventsWithPredicate:predicate];
 }
 -(void)showKursEvents
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"andelig-fode"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"Kurs og events"];
     [self showEventsWithPredicate:predicate];
 }
 -(void)showFestEvents
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"fest-og-moro"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventType == %@", @"Fest og moro"];
     [self showEventsWithPredicate:predicate];
 }
 
