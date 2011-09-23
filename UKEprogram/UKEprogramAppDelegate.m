@@ -230,8 +230,7 @@ NSURLConnection *nsuc;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    if ([self appHasLaunchedBefore]) {
-    } else {
+    if (![self appHasLaunchedBefore]) {
         [self checkReachability];
     }
     /*
