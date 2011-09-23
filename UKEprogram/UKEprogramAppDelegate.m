@@ -66,7 +66,6 @@ NSURLConnection *nsuc;
     NSNumberFormatter *numberFormat = [[NSNumberFormatter alloc] init];
     [numberFormat setNumberStyle:NSNumberFormatterDecimalStyle];
     for (int i = 0; i < [events count]; i++) {
-        
         NSDictionary *event = [events objectAtIndex:i];
         NSString *id = [[event objectForKey:@"id"] stringValue];
         Event *e;
@@ -87,6 +86,7 @@ NSURLConnection *nsuc;
             e = (Event *)[NSEntityDescription insertNewObjectForEntityForName:@"Event" inManagedObjectContext:con];
             e.id = [numberFormat numberFromString:id];
         }
+        
         e.lowestPrice = [numberFormat numberFromString:[[event objectForKey:@"lowestPrice"] stringValue]];
         //e.showingTime = [dateFormat dateFromString:[event objectForKey:@"showingTime"]];
         e.showingTime = [NSDate dateWithTimeIntervalSince1970:[[event objectForKey:@"showingTime"] longLongValue]/1000];
@@ -114,7 +114,6 @@ NSURLConnection *nsuc;
 
 - (UIColor *) getColorForEventCategory:(NSString *)category
 {
-    NSLog(@"Kategori: %@", category);
     UIColor *color;
     if ([category isEqualToString:@"Konsert"]) {
         color = [UIColor colorWithRed:0.686 green:0.576 blue:0.776 alpha:1.0];
@@ -132,6 +131,17 @@ NSURLConnection *nsuc;
     return color;
 }
 
+- (BOOL)appHasLaunchedBefore
+{
+    NSArray *listOfFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[[self applicationDocumentsDirectory] path] error:nil];
+    //register that the app has been run the first time  
+    for (id file in listOfFiles) {
+        if ([file isEqualToString:@"UKEprogram.sqlite"]) {
+            return YES;
+        }
+    }
+    return NO;
+}
 
 /**
  *  Called when data is retrieved from connection, adds any new events to object context and displays only the events recieved from connection
@@ -148,7 +158,7 @@ NSURLConnection *nsuc;
     Reachability *r = [Reachability reachabilityForInternetConnection];
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if(internetStatus == NotReachable) {
-        NSString *melding = [[NSString alloc] initWithString:@"Denne appen trenger tilgang til internett for Œ laste nyeste versjon av programmet. Tidligere lastet program vil bli vist."];
+        NSString *melding = [[NSString alloc] initWithString:@"Denne appen trenger tilgang til internett for Ã¥ laste nyeste versjon av programmet. Tidligere lastet program vil bli vist."];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ingen nettilgang!" 
 														message:melding 
 													   delegate:nil 
@@ -169,22 +179,26 @@ NSURLConnection *nsuc;
     [self.window addSubview:rootController.view];
     dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm"];
-    //[self checkReachability];
     
     // Override point for customization after application launch.
     [self.window makeKeyAndVisible];
     
     weekDayFormat = [[NSDateFormatter alloc] init];
     [weekDayFormat setDateFormat:@"e"];
+    NSLocale *local = [[NSLocale alloc] initWithLocaleIdentifier:@"nb"];
+    [weekDayFormat setLocale:local];
+    [local release];
     
     onlyDateFormat = [[NSDateFormatter alloc] init];
     [onlyDateFormat setDateFormat:@"dd.MM"];
     onlyTimeFormat  = [[NSDateFormatter alloc] init];
     [onlyTimeFormat setDateFormat:@"HH:mm"];
-    weekDays = [[NSArray alloc] initWithObjects:@"ubrukt",@"S¿ndag",@"Mandag",@"Tirsdag",@"Onsdag",@"Torsdag",@"Fredag",@"L¿rdag", nil];
+    weekDays = [[NSArray alloc] initWithObjects:@"ubrukt",@"Mandag",@"Tirsdag",@"Onsdag",@"Torsdag",@"Fredag", @"LÃ¸rdag", @"SÃ¸ndag", nil];
     checkedImage = [UIImage imageNamed:@"favorite.png"];
     uncheckedImage = [UIImage imageNamed:@"unfavorite.png"];
-    
+    //[self checkReachability];
+    //NSLog(@"har db-fil: %i", [self appHasLaunchedBefore]);
+
     return YES;
 }
 
@@ -200,6 +214,7 @@ NSURLConnection *nsuc;
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+    
     /*
      Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
      If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -215,7 +230,10 @@ NSURLConnection *nsuc;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [self checkReachability];
+    if ([self appHasLaunchedBefore]) {
+    } else {
+        [self checkReachability];
+    }
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */

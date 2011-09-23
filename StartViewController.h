@@ -16,6 +16,10 @@
     IBOutlet EventsTableViewController *eventsTableViewController;
     IBOutlet UIActivityIndicatorView *activityView;
     IBOutlet UILabel *activityLabel;
+    IBOutlet UILabel *activityLabelRefreshing;
+    
+    IBOutlet UIButton *refresh;
+    IBOutlet UIView *loaderView;
     
 }
 @property (nonatomic, retain) UIButton *allButton;
@@ -24,5 +28,9 @@
 @property (nonatomic, retain) EventsTableViewController *eventsTableViewController;
 @property (nonatomic, retain) IBOutlet UIActivityIndicatorView *activityView;
 @property (nonatomic, retain) IBOutlet UILabel *activityLabel;
+@property (nonatomic, retain) IBOutlet UILabel *activityLabelRefreshing;
+
+@property (nonatomic, retain) IBOutlet UIButton *refresh;
+@property (nonatomic, retain) IBOutlet UIView *loaderView;
 
 @end

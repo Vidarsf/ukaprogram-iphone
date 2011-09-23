@@ -42,8 +42,11 @@
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
+
 - (void)saveContext;
 - (NSURL *)applicationDocumentsDirectory;
 - (NSString *)getWeekDay:(NSDate *)date;
 - (UIColor *) getColorForEventCategory:(NSString *)category;
+- (void)checkReachability;
+- (BOOL)appHasLaunchedBefore;
 @end

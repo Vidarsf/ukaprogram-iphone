@@ -106,7 +106,7 @@ IBOutlet UIImage *eventImg;
     sView.contentSize=CGSizeMake(1, textHeight + leadHeight + leadLabel.frame.origin.y + 50);//1 is less than width of iphone
     
     favButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    favButton.frame = CGRectMake(0, 0, 40, 40);
+    favButton.frame = CGRectMake(0, 0, 25, 25);
     [favButton addTarget:self action:@selector(favoritesClicked:) forControlEvents:UIControlEventTouchUpInside];
     if ([event.favorites intValue] > 0) {
         [favButton setImage:[UIImage imageNamed:@"favorite.png"] forState:UIControlStateNormal];
@@ -117,7 +117,7 @@ IBOutlet UIImage *eventImg;
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:favButton] autorelease];
     
     //Put the loadSpinner into the eventImgView
-    loadSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    loadSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [loadSpinner setCenter:CGPointMake(eventImgView.frame.size.width/2, eventImgView.frame.size.height/2)];
     [eventImgView addSubview:loadSpinner];
 }
@@ -180,7 +180,7 @@ IBOutlet UIImage *eventImg;
     UIImage *placeHolderImage = [UIImage imageNamed:@"placeHolderImage.png"];
     
     if (doWeNeedToDownLoadImage) {
-        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://uka.no/%@", event.image]]]];
+        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:event.image]]];
         if (img != nil) {
             eventImgView.image = img;
             NSString *jpegFilePath = [NSString stringWithFormat:@"%@/%@.jpeg",docDir,fileNameWithoutExtention];

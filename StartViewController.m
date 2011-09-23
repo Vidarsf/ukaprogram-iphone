@@ -21,6 +21,9 @@
 @synthesize eventsTableViewController;
 @synthesize activityView;
 @synthesize activityLabel;
+@synthesize activityLabelRefreshing;
+@synthesize refresh;
+@synthesize loaderView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -33,7 +36,15 @@
 
 - (void)dealloc
 {
+    [self.allButton release];
+    [self.artistButton release];
+    [self.favoritesButton release];
     [self.eventsTableViewController release];
+    [self.activityView release];
+    [self.activityLabel release];
+    [self.activityLabelRefreshing release];
+    [self.refresh release];
+    [self.loaderView release];
     [super dealloc];
 }
 
@@ -46,17 +57,19 @@
 }
 
 
--(void)stopActivityIndication:(NSNotification *)notification
-{
-    [activityView stopAnimating];
-    [activityView setHidden:YES];
-    [activityLabel setHidden:YES];
-}
 -(void)startActivityIndication:(NSNotification *)notification
 {
+    [loaderView setHidden:NO];
+    [activityLabel setHidden:YES];
+    [refresh setHidden:YES];
     [activityView startAnimating];
-    [activityView setHidden:NO];
+}
+-(void)stopActivityIndication:(NSNotification *)notification
+{
+    [loaderView setHidden:YES];
     [activityLabel setHidden:NO];
+    [refresh setHidden:NO];
+    [activityView stopAnimating];
 }
 #pragma mark - View lifecycle
 
@@ -84,6 +97,12 @@
     [now release];
 }
 
+- (IBAction)refreshEvents:(id)sender {
+    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    [delegate checkReachability];
+}
+
+
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
@@ -91,10 +110,20 @@
     [allButton addTarget:self action:@selector(allEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     [favoritesButton addTarget:self action:@selector(favoriteEventsClicked:) forControlEvents:(UIControlEvents)UIControlEventTouchDown];
     self.navigationItem.title = @"Hjem";
-    [activityView startAnimating];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopActivityIndication:) name:@"stopActivityIndication" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startActivityIndication:) name:@"startActivityIndication" object:nil];
     self.eventsTableViewController = [[EventsTableViewController alloc] initWithNibName:@"EventsTableView" bundle:nil];
+    
+    UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate appHasLaunchedBefore]){
+        [activityLabel setHidden:NO];
+        [refresh setHidden:NO];
+        [loaderView setHidden:YES];
+    } else {
+        [activityView startAnimating];
+        [activityLabel setHidden:YES];
+        [refresh setHidden:YES];
+    }
 }
 
 - (void)viewDidUnload
@@ -115,6 +144,7 @@
     [super viewWillAppear:animated];
     UKEprogramAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [[delegate rootController] setNavigationBarHidden:YES];
+    
 }
 - (void)viewDidAppear:(BOOL)animated
 {
