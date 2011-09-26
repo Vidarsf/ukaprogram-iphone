@@ -42,6 +42,18 @@ NSURLConnection *nsuc;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError: (NSError *)error {
+    //Stop loading and give a warning
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopActivityIndication" object:nil];
+    
+    NSString *melding = [[NSString alloc] initWithString:@"Får ikke kontaktet FindMyApp. Vennligst prøv igjen senere."];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Kommunikasjonsproblem!" 
+                                                    message:melding 
+                                                   delegate:nil 
+                                          cancelButtonTitle:@"OK" 
+                                          otherButtonTitles: nil];
+    [alert show];
+    [alert release];
+    [melding release];
 }
 
 /**
@@ -136,6 +148,7 @@ NSURLConnection *nsuc;
     NSArray *listOfFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[[self applicationDocumentsDirectory] path] error:nil];
     //register that the app has been run the first time  
     for (id file in listOfFiles) {
+        //NSLog(@"Item: %@", file);
         if ([file isEqualToString:@"UKEprogram.sqlite"]) {
             return YES;
         }
@@ -230,6 +243,7 @@ NSURLConnection *nsuc;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    //NSLog(@"applicationDidBecomeActive:");
     if (![self appHasLaunchedBefore]) {
         [self checkReachability];
     }
